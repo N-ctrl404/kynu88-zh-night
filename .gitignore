@@ -1,3 +1,6 @@
 node_modules
 
 npm install
+
+# 忽略 Next.js 构建产物
+.next
