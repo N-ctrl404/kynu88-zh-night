@@ -1,0 +1,32 @@
+name: Update Data
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */4 * * *'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          cd data-scraper
+          pip install requests beautifulsoup4 googletrans==4.0.0-rc1
+      - name: Update data
+        run: |
+          cd data-scraper
+          python scrape.py
+          python translate.py
+          cp translated_data.json ../public/data/translated_data.json
+      - name: Commit and push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add public/data/translated_data.json
+          git commit -m "自动更新数据 $(date)" || exit 0
+          git push 
